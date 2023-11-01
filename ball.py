@@ -37,6 +37,16 @@ class Ball(Image):
 
         self.y_speed = -self.y_speed
 
+    def collision_wall(self):
+        if self.x + self.radius > 900:
+            self.x_speed = (self.x_speed)*(-1) 
+        if self.x - self.radius < 0:
+            self.x_speed = (self.x_speed)*(-1) 
+        if self.y - self.radius < 0:
+            self.y_speed = (self.y_speed)*(-1)  
+        if self.y + self.radius > 500:
+            self.y_speed = (self.y_speed)*(-1) 
+
     def update(self):
         self.gravityCheck()
         self.y += self.y_speed
