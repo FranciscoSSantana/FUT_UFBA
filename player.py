@@ -2,7 +2,7 @@ from tupy import *
 
 class Player(Image):
 
-    def __init__(self, x = 100, y = 400, file = "player.jpg", wasd_scheme = True):
+    def __init__(self, x, y, file, wasd_scheme=True):
         self.x = x
         self.y = y
         self.jumping = False
@@ -12,6 +12,7 @@ class Player(Image):
         self.jump_height = 20
         self.y_speed = self.jump_height
         self.y_gravity = 2
+        self.mass = 2
 
         if wasd_scheme:
             self.left = 'a'
