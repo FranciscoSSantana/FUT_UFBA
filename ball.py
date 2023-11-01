@@ -13,6 +13,7 @@ class Ball(Image):
         self.x_speed = 0
         self.y_speed = 0
         self.gravity = 2
+        self.mass = 1
     
     def gravityCheck(self):
         if self.y < (460 - self.radius):
@@ -24,7 +25,25 @@ class Ball(Image):
                 if abs(self.y_speed) <= self.stopBounce:
                     self.y_speed = 0
 
-    def update(self):
+    def collision_response(self, player):
+        relative_velocity_y = self.y_speed - player.y_speed
+        impulse = -(1 + self.elasticity) * relative_velocity_y / (1 / self.mass + 1 / player.mass)
+        self.y_speed += impulse / self.mass
 
+        if self.x > player.x:
+            self.x_speed += impulse / self.mass
+        else:
+            self.x_speed -= impulse / self.mass
+
+        self.y_speed = -self.y_speed
+
+    def update(self):
         self.gravityCheck()
         self.y += self.y_speed
+        self.x += self.x_speed
+
+        if self._collides_with(player1):
+            self.collision_response(player1)
+        
+        if self._collides_with(player2):
+            self.collision_response(player2)
