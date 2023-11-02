@@ -1,7 +1,7 @@
 from tupy import *
 
-class background(Image):
-    def __init__(self, file = "background_cherry.jpg"):
+class Background(Image):
+    def __init__(self, file = "CampJapan.png"):
         self.x = 450
-        self.y = 300
+        self.y = 250
         self.file = file
