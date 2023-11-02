@@ -1,26 +1,33 @@
 from tupy import *
 
+RIGHT_BOUNDARY = 850
+LEFT_BOUNDARY = 50
+UPPER_BOUNDARY = 0
+LOWER_BOUNDARY = 500
+GROUND_BOUNDARY = 460
+
 class Ball(Image):
-    def __init__(self, x = 400, y = 250):
+    def __init__(self, x = 450, y = 250):
         self.x = x
         self.y = y
         self.file = 'ball.png'
 
-        self.radius = 10
-        self.stopBounce = 2.5
+        self.radius = 18
+        self.stopBounce = 3
         self.elasticity = 0.7
+        self.frictionCoefficient = 0.03
 
         self.x_speed = 0
         self.y_speed = 0
-        self.gravity = 2
+        self.gravity = 1.5
         self.mass = 1
     
     def gravityCheck(self):
-        if self.y < (460 - self.radius):
+        if self.y < (GROUND_BOUNDARY - self.radius):
             self.y_speed += self.gravity
         else:
             if self.y_speed > self.stopBounce:
-                self.y_speed = self.y_speed * -1 * self.elasticity
+                self.y_speed = self.y_speed * (-1) * self.elasticity
             else:
                 if abs(self.y_speed) <= self.stopBounce:
                     self.y_speed = 0
@@ -38,22 +45,30 @@ class Ball(Image):
         self.y_speed = -self.y_speed
 
     def collision_wall(self):
-        if self.x + self.radius > 900:
-            self.x_speed = (self.x_speed)*(-1) 
-        if self.x - self.radius < 0:
-            self.x_speed = (self.x_speed)*(-1) 
-        if self.y - self.radius < 0:
-            self.y_speed = (self.y_speed)*(-1)  
-        if self.y + self.radius > 500:
-            self.y_speed = (self.y_speed)*(-1) 
+        if ((self.x < LEFT_BOUNDARY + self.radius) and (self.x_speed < 0)) or \
+           ((self.x > RIGHT_BOUNDARY - self.radius) and (self.x_speed > 0)):
+            
+            self.x_speed = self.x_speed * (-1) * self.elasticity
+        
+        if ((self.y < UPPER_BOUNDARY + self.radius) and (self.y_speed < 0)):
+            self.y_speed = self.y_speed * (-1) * self.elasticity
+    
+    def frictionCheck(self):
+        if self.y_speed == 0 and self.x_speed != 0:
+            if self.x_speed > 0:
+                self.x_speed -= self.frictionCoefficient
+            elif self.x_speed < 0:
+                self.x_speed += self.frictionCoefficient
 
     def update(self):
         self.gravityCheck()
+        self.collision_wall()
+        self.frictionCheck()
         self.y += self.y_speed
         self.x += self.x_speed
 
-        if self._collides_with(player1):
-            self.collision_response(player1)
-        
-        if self._collides_with(player2):
-            self.collision_response(player2)
+        #if self._collides_with(player1):
+        #    self.collision_response(player1)
+        #
+        #if self._collides_with(player2):
+        #    self.collision_response(player2)
