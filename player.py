@@ -37,9 +37,9 @@ class Player(Image):
         pass
 
     def update(self):
-        if keyboard.is_key_down(self.left):
+        if keyboard.is_key_down(self.left) and self.x > LEFT_BOUNDARY:
             self.x -= self.x_speed
-        if keyboard.is_key_down(self.right):
+        if keyboard.is_key_down(self.right) and self.x < RIGHT_BOUNDARY:
             self.x += self.x_speed
         if keyboard.is_key_just_down(self.jump_key):
             self.jumping = True
