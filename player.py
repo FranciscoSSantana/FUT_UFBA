@@ -9,8 +9,9 @@ PLAYER_HEIGHT = 64
 PLAYER_SPAWN = 250
 
 class Player(Image):
+
     PLAYERS = []
-    
+
     def __init__(self, x: int = PLAYER_SPAWN, y : int = GROUND_BOUNDARY - PLAYER_HEIGHT/2, file: str = 'Player Blue.png', wasd_scheme: bool = True) -> None:
         self.x = x
         self.y = y
@@ -21,8 +22,9 @@ class Player(Image):
         self.jump_height = -20
         self.y_speed = 0
         self.gravity = 2
-        self.mass = 2
+        self.mass = 50
         self.radius = 32
+        self.ballCollisionCooldown = 0
 
         if wasd_scheme:
             self.left = 'a'
@@ -42,9 +44,9 @@ class Player(Image):
 
     def update(self):
         if keyboard.is_key_down(self.left):
-            self.x_speed = -5
+            self.x_speed = -8
         if keyboard.is_key_down(self.right):
-            self.x_speed = 5
+            self.x_speed = 8
         if keyboard.is_key_just_down(self.jump_key) and self.jumping is False:
             self.jumping = True
             self.y_speed = self.jump_height
