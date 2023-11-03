@@ -9,8 +9,9 @@ PLAYER_HEIGHT = 64
 PLAYER_SPAWN = 150
 
 class Player(Image):
+    PLAYERS = []
 
-    def __init__(self, x: int = PLAYER_SPAWN, y : int = GROUND_BOUNDARY - PLAYER_HEIGHT/2, file: str = "Player Blue.png", wasd_scheme: bool = True) -> None:
+    def __init__(self, x: int = PLAYER_SPAWN, y : int = GROUND_BOUNDARY - PLAYER_HEIGHT/2, file: str = 'Player Blue.png', wasd_scheme: bool = True) -> None:
         self.x = x
         self.y = y
         self.jumping = False
@@ -32,6 +33,8 @@ class Player(Image):
             self.right = 'Right'
             self.jump_key = 'Up'
             self.power_key = 'enter'
+        
+        self.PLAYERS.append(self)
 
     def kick(self):
         pass
