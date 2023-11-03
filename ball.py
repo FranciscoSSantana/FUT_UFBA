@@ -1,4 +1,6 @@
 from tupy import *
+from player import Player
+from background import background
 
 RIGHT_BOUNDARY = 850
 LEFT_BOUNDARY = 50
@@ -66,9 +68,11 @@ class Ball(Image):
         self.frictionCheck()
         self.y += self.y_speed
         self.x += self.x_speed
-
-        #if self._collides_with(player1):
-        #    self.collision_response(player1)
-        #
-        #if self._collides_with(player2):
-        #    self.collision_response(player2)
+        
+        if len(Player.PLAYERS) > 0:
+            for player in Player.PLAYERS:
+                if self._collides_with(player):
+                    self.collision_response(player)
+                
+                if self._collides_with(player):
+                    self.collision_response(player)
