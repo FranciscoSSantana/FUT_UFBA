@@ -85,6 +85,12 @@ class Ball(Image):
         self.gravityCheck()
         self.collision_wall()
         self.frictionCheck()
+
+        if self.x_speed > 0:
+            self.angle -= 20
+
+        if self.x_speed < 0:
+            self.angle += 20
         
         if len(Player.PLAYERS) > 0:
             for player in Player.PLAYERS:
