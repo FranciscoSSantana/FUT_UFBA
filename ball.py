@@ -99,7 +99,8 @@ class Ball(Image):
 # player1 = Player(100, 400, file="Player Blue.png", wasd_scheme=True)
 # player2 = Player(600, 400, file="Player Red.png", wasd_scheme=False)
 # ball = Ball()
-# goal = Goal()
+# goal = Goal(68, 385, file="Goal Front Esq.png")
+# goal2 = Goal(831, 385, file="Goal Front Dir.png")
 
 
 
