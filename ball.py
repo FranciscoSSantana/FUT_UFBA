@@ -1,6 +1,7 @@
 from tupy import *
 from player import Player
-from background import background
+from background import Background
+import numpy as np
 
 RIGHT_BOUNDARY = 850
 LEFT_BOUNDARY = 50
@@ -24,6 +25,12 @@ class Ball(Image):
         self.y_speed = 0
         self.gravity = 1.5
         self.mass = 1
+
+    def center_ball(self):
+        self.x = 450
+        self.y = 250
+        self.x_speed = 0
+        self.y_speed = 0
     
     def gravityCheck(self):
         if self.y < (GROUND_BOUNDARY - self.radius):
@@ -87,3 +94,10 @@ class Ball(Image):
         self.y += self.y_speed
         self.x += self.x_speed
                 
+# back = Background()
+# player1 = Player(100, 400, file="Player Blue.png", wasd_scheme=True)
+# player2 = Player(600, 400, file="Player Red.png", wasd_scheme=False)
+# ball = Ball()
+
+
+# run(globals())
