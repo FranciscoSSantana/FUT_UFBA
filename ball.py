@@ -17,7 +17,8 @@ class Ball(Image):
         self.radius = 18
         self.stopBounce = 3
         self.elasticity = 0.7
-        self.frictionCoefficient = 0.03
+        self.frictionCoefficient = 0.1
+        self.stopMovement = 0.1
 
         self.x_speed = 0
         self.y_speed = 0
@@ -35,16 +36,24 @@ class Ball(Image):
                     self.y_speed = 0
 
     def collision_response(self, player):
-        relative_velocity_y = self.y_speed - player.y_speed
-        impulse = -(1 + self.elasticity) * relative_velocity_y / (1 / self.mass + 1 / player.mass)
-        self.y_speed += impulse / self.mass
+        normal_vector = [self.x - player.x, self.y - player.y]
+        normal_vector = np.array(normal_vector)
+        normal_vector = normal_vector / np.linalg.norm(normal_vector)
+        tangent_vector = np.array([-1 * normal_vector[1], normal_vector[0]])
 
-        if self.x > player.x:
-            self.x_speed += impulse / self.mass
-        else:
-            self.x_speed -= impulse / self.mass
+        ball_speed_vector = np.array([self.x_speed, self.y_speed])
+        player_speed_vector = np.array([player.x_speed, player.y_speed])
 
-        self.y_speed = -self.y_speed
+        ball_normal_speed = np.dot(normal_vector, ball_speed_vector)
+        ball_tangent_speed = np.dot(tangent_vector, ball_speed_vector)
+
+        player_normal_speed = np.dot(normal_vector, player_speed_vector)
+
+        ball_normal_speed = (ball_normal_speed * (self.mass - player.mass) + (2 * player.mass * player_normal_speed)) / (self.mass + player.mass)
+        ball_speed_vector = (ball_normal_speed * normal_vector) + (ball_tangent_speed * tangent_vector)
+
+        self.x_speed = ball_speed_vector[0]
+        self.y_speed = ball_speed_vector[1]
 
     def collision_wall(self):
         if ((self.x < LEFT_BOUNDARY + self.radius) and (self.x_speed < 0)) or \
@@ -56,23 +65,25 @@ class Ball(Image):
             self.y_speed = self.y_speed * (-1) * self.elasticity
     
     def frictionCheck(self):
-        if self.y_speed == 0 and self.x_speed != 0:
+        if self.y_speed == 0 and self.x_speed != 0.0:
             if self.x_speed > 0:
                 self.x_speed -= self.frictionCoefficient
             elif self.x_speed < 0:
                 self.x_speed += self.frictionCoefficient
+        if abs(self.x_speed) <= self.stopMovement:
+            self.x_speed = 0
 
     def update(self):
         self.gravityCheck()
         self.collision_wall()
         self.frictionCheck()
-        self.y += self.y_speed
-        self.x += self.x_speed
         
         if len(Player.PLAYERS) > 0:
             for player in Player.PLAYERS:
-                if self._collides_with(player):
+                distance = ((self.x - player.x)**2 + (self.y - player.y)**2)**0.5
+                if distance <= self.radius + player.radius:
                     self.collision_response(player)
+
+        self.y += self.y_speed
+        self.x += self.x_speed
                 
-                if self._collides_with(player):
-                    self.collision_response(player)
