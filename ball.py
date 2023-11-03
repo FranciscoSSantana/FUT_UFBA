@@ -1,7 +1,5 @@
 from tupy import *
 from player import Player
-from background import Background
-from goal import Goal
 import numpy as np
 
 RIGHT_BOUNDARY = 850
@@ -19,19 +17,13 @@ class Ball(Image):
         self.radius = 18
         self.stopBounce = 3
         self.elasticity = 0.7
-        self.frictionCoefficient = 0.1
+        self.frictionCoefficient = 0.09
         self.stopMovement = 0.1
 
         self.x_speed = 0
         self.y_speed = 0
-        self.gravity = 1.5
-        self.mass = 1
-
-    def center_ball(self):
-        self.x = 450
-        self.y = 250
-        self.x_speed = 0
-        self.y_speed = 0
+        self.gravity = 0.5
+        self.mass = 0
     
     def gravityCheck(self):
         if self.y < (GROUND_BOUNDARY - self.radius):
@@ -57,11 +49,12 @@ class Ball(Image):
 
         player_normal_speed = np.dot(normal_vector, player_speed_vector)
 
-        ball_normal_speed = (ball_normal_speed * (self.mass - player.mass) + (2 * player.mass * player_normal_speed)) / (self.mass + player.mass)
-        ball_speed_vector = (ball_normal_speed * normal_vector) + (ball_tangent_speed * tangent_vector)
+        ball_new_normal_speed = (ball_normal_speed * (self.mass - player.mass) + (2 * player.mass * player_normal_speed)) / (self.mass + player.mass)
+        ball_speed_vector = (ball_new_normal_speed * normal_vector) + (ball_tangent_speed * tangent_vector)
 
-        self.x_speed = ball_speed_vector[0]
-        self.y_speed = ball_speed_vector[1]
+        self.x_speed = ball_speed_vector[0] * self.elasticity
+        self.y_speed = ball_speed_vector[1] * self.elasticity
+
 
     def collision_wall(self):
         if ((self.x < LEFT_BOUNDARY + self.radius) and (self.x_speed < 0)) or \
@@ -91,23 +84,17 @@ class Ball(Image):
 
         if self.x_speed < 0:
             self.angle += 20
-        
+
         if len(Player.PLAYERS) > 0:
             for player in Player.PLAYERS:
+
+                if player.ballCollisionCooldown > 0:
+                    player.ballCollisionCooldown -= 1
+
                 distance = ((self.x - player.x)**2 + (self.y - player.y)**2)**0.5
-                if distance <= self.radius + player.radius:
+                if (distance <= self.radius + player.radius) and (player.ballCollisionCooldown == 0):
+                    player.ballCollisionCooldown = 15
                     self.collision_response(player)
 
         self.y += self.y_speed
         self.x += self.x_speed
-                
-# back = Background()
-# player1 = Player(100, 400, file="Player Blue.png", wasd_scheme=True)
-# player2 = Player(600, 400, file="Player Red.png", wasd_scheme=False)
-# ball = Ball()
-# goal = Goal(68, 385, file="Goal Front Esq.png")
-# goal2 = Goal(831, 385, file="Goal Front Dir.png")
-
-
-
-# run(globals())
