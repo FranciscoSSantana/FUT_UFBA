@@ -1,6 +1,7 @@
 from tupy import *
 from player import Player
 from background import Background
+from goal import Goal
 import numpy as np
 
 RIGHT_BOUNDARY = 850
@@ -98,6 +99,8 @@ class Ball(Image):
 # player1 = Player(100, 400, file="Player Blue.png", wasd_scheme=True)
 # player2 = Player(600, 400, file="Player Red.png", wasd_scheme=False)
 # ball = Ball()
+# goal = Goal()
+
 
 
 # run(globals())
