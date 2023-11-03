@@ -18,7 +18,7 @@ class Player(Image):
         self.file = file
 
         self.x_speed = 0
-        self.jump_height = 20
+        self.jump_height = -20
         self.y_speed = 0
         self.gravity = 2
         self.mass = 2
@@ -54,9 +54,9 @@ class Player(Image):
         self.x += self.x_speed
 
         if self.jumping:
-            self.y -= self.y_speed
-            self.y_speed -= self.gravity
-            if self.y_speed < -self.jump_height:
+            self.y += self.y_speed
+            self.y_speed += self.gravity
+            if self.y_speed > -self.jump_height:
                 self.jumping = False
                 self.y_speed = 0
         
