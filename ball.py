@@ -1,41 +1,54 @@
 from tupy import *
 from player import Player
+from gameconstants import *
 import numpy as np
 
-RIGHT_BOUNDARY = 850
-LEFT_BOUNDARY = 50
-UPPER_BOUNDARY = 0
-LOWER_BOUNDARY = 500
-GROUND_BOUNDARY = 460
-
 class Ball(Image):
-    def __init__(self, x = 450, y = 250):
-        self.x = x
-        self.y = y
-        self.file = 'ball.png'
+    def __init__(self):
+        self.radius = BALL_RADIUS
+        self.stopBounce = BALL_BOUNCE_STOP_COEFFICIENT
+        self.elasticity = BALL_ELASTICITY
+        self.frictionCoefficient = BALL_FRICTION_COEFFICIENT
+        self.stopMovement = BALL_STOP_MOVEMENT_COEFFICIENT
 
-        self.radius = 18
-        self.stopBounce = 3
-        self.elasticity = 0.7
-        self.frictionCoefficient = 0.09
-        self.stopMovement = 0.1
+        self.gravity = BALL_GRAVITY
+        self.mass = BALL_MASS
 
-        self.x_speed = 0
-        self.y_speed = 0
-        self.gravity = 0.5
-        self.mass = 0
+        self.kick_off()
     
-    def gravityCheck(self):
+    def kick_off(self):
+        self.x = BALL_KICK_OFF_X
+        self.y = BALL_KICK_OFF_Y
+        self.x_speed = BALL_KICK_OFF_X_SPEED
+        self.y_speed = BALL_KICK_OFF_Y_SPEED
+        for player in Player.PLAYERS:
+            player.kick_off()
+    
+    def handleGravity_and_FloorCollision(self):
+        #Apply gravity
         if self.y < (GROUND_BOUNDARY - self.radius):
             self.y_speed += self.gravity
         else:
+            #Floor collision
             if self.y_speed > self.stopBounce:
                 self.y_speed = self.y_speed * (-1) * self.elasticity
             else:
                 if abs(self.y_speed) <= self.stopBounce:
                     self.y_speed = 0
+    
+    def checkPlayerCollision(self):
+        if len(Player.PLAYERS) > 0:
+            for player in Player.PLAYERS:
 
-    def collision_response(self, player):
+                if player.ballCollisionCooldown < PLAYER_BALL_COLLISION_COOLDOWN:
+                    player.ballCollisionCooldown += 1
+
+                distance = ((self.x - player.x)**2 + (self.y - player.y)**2)**0.5
+                if (distance <= self.radius + player.radius) and (player.ballCollisionCooldown == PLAYER_BALL_COLLISION_COOLDOWN):
+                    player.ballCollisionCooldown = 0
+                    self.handlePlayerCollision(player)
+
+    def handlePlayerCollision(self, player):
         normal_vector = [self.x - player.x, self.y - player.y]
         normal_vector = np.array(normal_vector)
         normal_vector = normal_vector / np.linalg.norm(normal_vector)
@@ -55,17 +68,38 @@ class Ball(Image):
         self.x_speed = ball_speed_vector[0] * self.elasticity
         self.y_speed = ball_speed_vector[1] * self.elasticity
 
-
-    def collision_wall(self):
+    def handleWallCollision_and_GoalDetection(self):
+        
+        #Side-walls collisions
         if ((self.x < LEFT_BOUNDARY + self.radius) and (self.x_speed < 0)) or \
            ((self.x > RIGHT_BOUNDARY - self.radius) and (self.x_speed > 0)):
             
             self.x_speed = self.x_speed * (-1) * self.elasticity
+            
+            #Goal detection
+            if (self.y < GROUND_BOUNDARY) and (self.y > GROUND_BOUNDARY - GOAL_SIZE):
+                self.kick_off()
         
+        #Roof collision
         if ((self.y < UPPER_BOUNDARY + self.radius) and (self.y_speed < 0)):
             self.y_speed = self.y_speed * (-1) * self.elasticity
     
-    def frictionCheck(self):
+    def handleGoalpostCollision(self):
+
+        #top-side post collision
+        if (self.y + self.radius > GOALPOST_TOP) and \
+           (self.y < GOALPOST_TOP) and \
+           ((self.x + self.radius >= GOALPOST_RIGHT_WALL) or (self.x - self.radius <= GOALPOST_LEFT_WALL)):
+            
+            self.y_speed *= (-1) * self.elasticity
+
+            #avoid cases of stuck ball
+            if (self.x >= RIGHT_BOUNDARY - GOALPOST_WIDTH):
+                self.x_speed -= 1
+            elif(self.x <= LEFT_BOUNDARY + GOALPOST_WIDTH):
+                self.x_speed += 1
+
+    def handleFriction(self):
         if self.y_speed == 0 and self.x_speed != 0.0:
             if self.x_speed > 0:
                 self.x_speed -= self.frictionCoefficient
@@ -73,28 +107,22 @@ class Ball(Image):
                 self.x_speed += self.frictionCoefficient
         if abs(self.x_speed) <= self.stopMovement:
             self.x_speed = 0
-
-    def update(self):
-        self.gravityCheck()
-        self.collision_wall()
-        self.frictionCheck()
-
+    
+    def handleSpin(self):
         if self.x_speed > 0:
-            self.angle -= 20
-
+            self.angle -= BALL_SPIN
         if self.x_speed < 0:
-            self.angle += 20
+            self.angle += BALL_SPIN
 
-        if len(Player.PLAYERS) > 0:
-            for player in Player.PLAYERS:
-
-                if player.ballCollisionCooldown > 0:
-                    player.ballCollisionCooldown -= 1
-
-                distance = ((self.x - player.x)**2 + (self.y - player.y)**2)**0.5
-                if (distance <= self.radius + player.radius) and (player.ballCollisionCooldown == 0):
-                    player.ballCollisionCooldown = 15
-                    self.collision_response(player)
-
+    def handlePhysics(self):
+        self.handleGravity_and_FloorCollision()
+        self.handleWallCollision_and_GoalDetection()
+        self.handleFriction()
+        self.checkPlayerCollision()
+        self.handleSpin()
+        self.handleGoalpostCollision()
         self.y += self.y_speed
         self.x += self.x_speed
+
+    def update(self):
+        self.handlePhysics()
