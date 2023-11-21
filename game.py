@@ -4,13 +4,16 @@ from ball import Ball
 from goal import Goal
 from background import Background
 from pause import Pause
+from placar import Placar
 
 bg = Background()
 pause = Pause()
 playerBlue = Player(True)
 playerRed = Player(False)
-bola = Ball()
+placar = Placar()
+bola = Ball(placar)
 gl = Goal(True)
 gl2 = Goal(False)
 
 run(globals())
+
