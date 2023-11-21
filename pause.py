@@ -22,12 +22,14 @@ class Pause(Image):
                         from game import playerBlue
                         from game import playerRed
                         from game import bola
+                        from game import placar
                         self.resume._hide()
                         self.restart._hide()
                         self.back._hide()
                         playerBlue.game_is_on = True
                         playerRed.game_is_on = True
                         bola.game_is_on = True
+                        placar.game_is_on = True
                         self.menu = False        
         
         if mouse.x > self.x - 20 and mouse.x < self.x + 20 and \
@@ -35,9 +37,11 @@ class Pause(Image):
                 from game import playerBlue
                 from game import playerRed
                 from game import bola
+                from game import placar
                 playerBlue.game_is_on = False
                 playerRed.game_is_on = False
                 bola.game_is_on = False
+                placar.game_is_on = True
                 self.back = Menu()
                 self.resume = Resume()
                 self.restart = Restart()
