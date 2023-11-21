@@ -4,13 +4,14 @@ from gameconstants import *
 import numpy as np
 
 class Ball(Image):
-    def __init__(self):
+    def __init__(self, placar):
         self.radius = BALL_RADIUS
         self.stopBounce = BALL_BOUNCE_STOP_COEFFICIENT
         self.elasticity = BALL_ELASTICITY
         self.frictionCoefficient = BALL_FRICTION_COEFFICIENT
         self.stopMovement = BALL_STOP_MOVEMENT_COEFFICIENT
         self.game_is_on = True
+        self.placar = placar
 
         self.gravity = BALL_GRAVITY
         self.mass = BALL_MASS
@@ -69,22 +70,36 @@ class Ball(Image):
         self.x_speed = ball_speed_vector[0] * self.elasticity
         self.y_speed = ball_speed_vector[1] * self.elasticity
 
-    def handleWallCollision_and_GoalDetection(self):
-        
+    def handleWallCollision_and_GoalDetectionL(self):
+
         #Side-walls collisions
-        if ((self.x < LEFT_BOUNDARY + self.radius) and (self.x_speed < 0)) or \
-           ((self.x > RIGHT_BOUNDARY - self.radius) and (self.x_speed > 0)):
+        if ((self.x < LEFT_BOUNDARY + self.radius) and (self.x_speed < 0)):
             
             self.x_speed = self.x_speed * (-1) * self.elasticity
-            
+
             #Goal detection
-            if (self.y < GROUND_BOUNDARY) and (self.y > GROUND_BOUNDARY - GOAL_SIZE):
+            if ((self.y < GROUND_BOUNDARY) and (self.y > GROUND_BOUNDARY - GOAL_SIZE)):
                 self.kick_off()
+                self.placar.addgoalL()
+                
         
         #Roof collision
         if ((self.y < UPPER_BOUNDARY + self.radius) and (self.y_speed < 0)):
             self.y_speed = self.y_speed * (-1) * self.elasticity
-    
+
+    def handleWallCollision_and_GoalDetectionR(self):
+
+            #Side-walls collisions
+            if ((self.x > RIGHT_BOUNDARY - self.radius) and (self.x_speed > 0)):
+                
+                self.x_speed = self.x_speed * (-1) * self.elasticity
+
+                #Goal detection
+                if ((self.y < GROUND_BOUNDARY) and (self.y > GROUND_BOUNDARY - GOAL_SIZE)):
+                    self.kick_off()
+                    self.placar.addgoalR()
+                
+
     def handleGoalpostCollision(self):
 
         #top-side post collision
@@ -117,7 +132,8 @@ class Ball(Image):
 
     def handlePhysics(self):
         self.handleGravity_and_FloorCollision()
-        self.handleWallCollision_and_GoalDetection()
+        self.handleWallCollision_and_GoalDetectionL()
+        self.handleWallCollision_and_GoalDetectionR()
         self.handleFriction()
         self.checkPlayerCollision()
         self.handleSpin()
