@@ -10,6 +10,7 @@ class Ball(Image):
         self.elasticity = BALL_ELASTICITY
         self.frictionCoefficient = BALL_FRICTION_COEFFICIENT
         self.stopMovement = BALL_STOP_MOVEMENT_COEFFICIENT
+        self.game_is_on = True
 
         self.gravity = BALL_GRAVITY
         self.mass = BALL_MASS
@@ -125,4 +126,5 @@ class Ball(Image):
         self.x += self.x_speed
 
     def update(self):
-        self.handlePhysics()
+        if self.game_is_on:
+            self.handlePhysics()
