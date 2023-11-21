@@ -9,6 +9,7 @@ class Player(Image):
         
         self.isBluePlayer = isBluePlayer
 
+        self.game_is_on = True
         self.jump_height = PLAYER_JUMP_HEIGHT
         self.gravity = PLAYER_GRAVITY
         self.mass = PLAYER_MASS
@@ -76,4 +77,5 @@ class Player(Image):
         self.x += self.x_speed
 
     def update(self):
-        self.move()
+        if self.game_is_on:
+            self.move()
