@@ -2,7 +2,18 @@ from tupy import *
 from gameconstants import *
 
 class Background(Image):
-    def __init__(self, file = "CampJapan.png"):
-        self.x = X_CENTER
-        self.y = Y_CENTER
-        self.file = file
+
+    backgrounds = ["CampJapan.png", 
+                   "CampBrasil.png", 
+                   "CampEgypt.png", 
+                   "CampItaly.png", 
+                   "CampParis.png", 
+                   "CampUS.png"]
+    
+    def __init__(self) -> None:
+        self._x = X_CENTER
+        self._y = Y_CENTER
+        self.kick_off()
+    
+    def kick_off(self):
+        self.file = random.choice(Background.backgrounds)
