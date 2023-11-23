@@ -1,5 +1,6 @@
 from tupy import *
 from gameconstants import *
+from pause import Pause
 
 class Player(Image):
 
@@ -9,7 +10,6 @@ class Player(Image):
         
         self.isBluePlayer = isBluePlayer
 
-        self.game_is_on = True
         self.jump_height = PLAYER_JUMP_HEIGHT
         self.gravity = PLAYER_GRAVITY
         self.mass = PLAYER_MASS
@@ -31,7 +31,11 @@ class Player(Image):
         
         self.kick_off()
 
-        self.PLAYERS.append(self)
+        Player.PLAYERS.append(self)
+    
+    def _destroy(self) -> None:
+        Player.PLAYERS.remove(self)
+        super()._destroy()
 
     def kick(self):
         pass
@@ -74,8 +78,14 @@ class Player(Image):
     def move(self):
         self.movementInput()
         self.handleJump()
-        self.x += self.x_speed
+        if self.x - PLAYER_WIDTH//2 >= LEFT_BOUNDARY and self.x + PLAYER_WIDTH//2 <= RIGHT_BOUNDARY:
+            self.x += self.x_speed
+        else:
+            if self.x - PLAYER_WIDTH//2 < LEFT_BOUNDARY:
+                self.x += PLAYER_WIDTH//8
+            else:
+                self.x -= PLAYER_WIDTH//8
 
     def update(self):
-        if self.game_is_on:
+        if not Pause.isPaused:
             self.move()
