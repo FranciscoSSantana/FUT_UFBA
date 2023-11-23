@@ -1,30 +1,30 @@
 from tupy import *
 from gameconstants import *
+from pause import Pause
 
 class Placar(Image):
-
-    NUM = [
-        "0.png", "1.png", "2.png", "3.png", "4.png",
-        "5.png", "6.png", "7.png", "8.png", "9.png"
-    ]
-
     def __init__(self):
         self.x = X_CENTER
         self.y = PLACAR_Y
-        self.counter = 0
-        self.scoreR = 0
-        self.scoreL = 0
-        self.game_is_on = True
-        self.tempo = 90
-        self.t1 = Números(TIME_TENS_X, TIME_Y, self.get_number_image(9))
-        self.t2 = Números(TIME_UNITS_X, TIME_Y, self.get_number_image(0))
-        self.scoreR_image_tens = Números(SCORE_R_TENS_X, SCORE_Y, self.get_number_image(0))
-        self.scoreR_image_units = Números(SCORE_R_UNITS_X, SCORE_Y, self.get_number_image(0))
-        self.scoreL_image_tens = Números(SCORE_L_TENS_X, SCORE_Y, self.get_number_image(0))
-        self.scoreL_image_units = Números(SCORE_L_UNITS_X, SCORE_Y, self.get_number_image(0))
+        self.t1 = Image(self.get_number_image(0), TIME_TENS_X, TIME_Y)
+        self.t2 = Image(self.get_number_image(0), TIME_UNITS_X, TIME_Y)
+        self.blueScore_image_tens = Image(self.get_number_image(0), BLUE_SCORE_TENS_X, SCORE_Y)
+        self.blueScore_image_units = Image(self.get_number_image(0), BLUE_SCORE_UNITS_X, SCORE_Y)
+        self.redScore_image_tens = Image(self.get_number_image(0), RED_SCORE_TENS_X, SCORE_Y)
+        self.redScore_image_units = Image(self.get_number_image(0), RED_SCORE_UNITS_X, SCORE_Y)
+        self.kick_off()
 
+    def _destroy(self) -> None:
+        self.t1._destroy()
+        self.t2._destroy()
+        self.blueScore_image_tens._destroy()
+        self.blueScore_image_units._destroy()
+        self.redScore_image_tens._destroy()
+        self.redScore_image_units._destroy()
+        super()._destroy()
+    
     def update(self):
-        if self.game_is_on:
+        if not Pause.isPaused:
             self.counter += 1
             if self.counter == 21:
                 self.counter = 0
@@ -32,6 +32,14 @@ class Placar(Image):
                 self.update_number_images()
             if self.tempo == 0:
                  self.get_winner()
+    
+    def kick_off(self):
+        self.ganhador = 0
+        self.counter = 0
+        self.blueScore = BLUE_INITIAL_SCORE
+        self.redScore = RED_INITIAL_SCORE
+        self.tempo = TIME
+        self.update_number_images()
 
     def update_number_images(self):
         t1_digit = self.tempo // 10
@@ -40,58 +48,32 @@ class Placar(Image):
         self.t1.file = self.get_number_image(t1_digit)
         self.t2.file = self.get_number_image(t2_digit)
 
-        scoreR_tens_digit = self.scoreR // 10
-        scoreR_units_digit = self.scoreR % 10
+        blueScore_tens_digit = self.blueScore // 10
+        blueScore_units_digit = self.blueScore % 10
 
-        self.scoreR_image_tens.file = self.get_number_image(scoreR_tens_digit)
-        self.scoreR_image_units.file = self.get_number_image(scoreR_units_digit)
+        self.blueScore_image_tens.file = self.get_number_image(blueScore_tens_digit)
+        self.blueScore_image_units.file = self.get_number_image(blueScore_units_digit)
 
-        scoreL_tens_digit = self.scoreL // 10
-        scoreL_units_digit = self.scoreL % 10
+        redScore_tens_digit = self.redScore // 10
+        redScore_units_digit = self.redScore % 10
 
-        self.scoreL_image_tens.file = self.get_number_image(scoreL_tens_digit)
-        self.scoreL_image_units.file = self.get_number_image(scoreL_units_digit)
+        self.redScore_image_tens.file = self.get_number_image(redScore_tens_digit)
+        self.redScore_image_units.file = self.get_number_image(redScore_units_digit)
 
     def get_number_image(self, digit):
-         return self.NUM[digit]
+         return f'{digit}.png'
 
-    def addgoalL(self):
-        self.scoreL += 1
+    def addRedGoal(self):
+        self.redScore += 1
         self.update_number_images()
 
-    def addgoalR(self):
-        self.scoreR += 1
+    def addBlueGoal(self):
+        self.blueScore += 1
         self.update_number_images()
 
     def get_winner(self):
-        from game import playerBlue
-        from game import playerRed
-        from game import bola
-        playerBlue.game_is_on = False
-        playerRed.game_is_on = False
-        bola.game_is_on = False
-        self.game_is_on = False
-        if self.scoreL > self.scoreR:
-            ganhador = Ganhador(2)
-        if self.scoreR > self.scoreL:
-            ganhador = Ganhador(1)
-
-class Ganhador(Image):
-    def __init__(self, ganhou):
-        if ganhou == 1:
-            self.file = "P1 WINS!.png"
-        if ganhou == 2:
-            self.file = "P2 WINS!.png"
-        self.x = X_CENTER
-        self.y = Y_CENTER
-
-class Números(Image):
-    def __init__(self, x, y, file):
-        self.x = x
-        self.y = y
-        self.file = file
-
-
-
-
-
+        if self.redScore > self.blueScore:
+            self.ganhador = 2
+        if self.blueScore > self.redScore:
+            self.ganhador = 1
+        Pause.isPaused = True
