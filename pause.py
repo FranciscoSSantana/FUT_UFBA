@@ -1,53 +1,68 @@
 from tupy import *
 from gameconstants import *
-from menu import Menu
-from menu import Resume
-from menu import Restart
-
+from buttons import MenuBackground, Resume, Restart
 
 class Pause(Image):
-    def __init__(self, file = "pause.png"):
-        self.x = RIGHT_BOUNDARY - 50
-        self.y = UPPER_BOUNDARY + 50
-        self.file = file
-        self.menu = False
-        self.resume = None
-        self.restart = None
-        self.back = None
-        
+    _isPaused = False
+
+    @property
+    def isPaused(self):
+        return Pause._isPaused
+    
+    @isPaused.setter
+    def isPaused(self, p):
+        Pause._isPaused = p
+
+    def __init__(self):
+        self.x = RIGHT_BOUNDARY - BUTTON_OFFSET
+        self.y = UPPER_BOUNDARY + BUTTON_OFFSET
+        self.file = "pause.png"
+        self.gameRestart = False
+        self.menuBackground = MenuBackground()
+        self.resumeButton = Resume()
+        self.restartButton = Restart()
+        self.resume()
+    
+    def _destroy(self) -> None:
+        self.menuBackground._destroy()
+        self.resumeButton._destroy()
+        self.restartButton._destroy()
+        super()._destroy()
+
+    def kick_off(self):
+        self.resume()
+        self.gameRestart = False
+
     def pause(self):
-        if self.menu:
-            if mouse.x > self.resume.x - 100 and mouse.x < self.resume.x + 100 and \
-                mouse.y > self.resume.y - 40 and mouse.y < self.resume.y + 40 and mouse.is_button_just_down():
-                        from game import playerBlue
-                        from game import playerRed
-                        from game import bola
-                        from game import placar
-                        self.resume._hide()
-                        self.restart._hide()
-                        self.back._hide()
-                        playerBlue.game_is_on = True
-                        playerRed.game_is_on = True
-                        bola.game_is_on = True
-                        placar.game_is_on = True
-                        self.menu = False        
-        
-        if mouse.x > self.x - 20 and mouse.x < self.x + 20 and \
-            mouse.y > self.y - 24 and mouse.y < self.y + 24 and mouse.is_button_just_down():
-                from game import playerBlue
-                from game import playerRed
-                from game import bola
-                from game import placar
-                playerBlue.game_is_on = False
-                playerRed.game_is_on = False
-                bola.game_is_on = False
-                placar.game_is_on = True
-                self.back = Menu()
-                self.resume = Resume()
-                self.restart = Restart()
-                self.menu = True
-                
+        self.resumeButton._show()
+        self.restartButton._show()
+        self.menuBackground._show()
+        Pause.isPaused = True
+    
+    def resume(self):
+        self.resumeButton._hide()
+        self.restartButton._hide()
+        self.menuBackground._hide()
+        Pause.isPaused = False
+    
+    def restart(self):
+        self.gameRestart = True
+        self.resume()
+
+    def detectClick(self):
+        if Pause.isPaused:
+            if (self.resumeButton._contains_point(mouse.x, mouse.y) or self._contains_point(mouse.x, mouse.y)) \
+                and mouse.is_button_just_down():
+                self.resume()
+
+            elif self.restartButton._contains_point(mouse.x, mouse.y) and mouse.is_button_just_down():
+                self.restart()
+
+        else:
+            if self._contains_point(mouse.x, mouse.y) and mouse.is_button_just_down():
+                self.pause()
+
     def update(self):
-        self.pause()
+        self.detectClick()
         
                 
