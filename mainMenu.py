@@ -6,6 +6,7 @@ from goal import Goal
 from background import Background
 from pause import Pause
 from placar import Placar
+from powerbox import PowerBox
 
 class MainMenu(Image):
     def __init__(self) -> None:
@@ -53,6 +54,7 @@ class MainMenu(Image):
         self.pause = Pause()
         self.leftgoal = Goal(True)
         self.rightgoal = Goal(False)
+        self.powerbox = PowerBox()
 
         self.winscreen = Image(f"P{self.placar.ganhador} WINS!.png", X_CENTER, Y_CENTER)
         self.winscreen._hide()
@@ -67,6 +69,7 @@ class MainMenu(Image):
             self.placar.kick_off()
             self.bola.kick_off()
             self.pause.kick_off()
+            self.powerbox.kick_off()
     
     def checkEnd(self):
         self.file = f"P{self.placar.ganhador} WINS!.png"
