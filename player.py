@@ -3,8 +3,9 @@ from gameconstants import *
 from pause import Pause
 
 class Player(Image):
-
+        
     PLAYERS = []
+    
 
     def __init__(self, isBluePlayer: bool = True) -> None:
         
@@ -15,6 +16,7 @@ class Player(Image):
         self.mass = PLAYER_MASS
         self.radius = PLAYER_RADIUS
         self.ballCollisionCooldown = PLAYER_BALL_COLLISION_COOLDOWN
+        self.boost = False
 
         if self.isBluePlayer:
             self.file = "Player Blue.png"
@@ -58,6 +60,25 @@ class Player(Image):
             self.x_speed = PLAYER_X_MOVING_SPEED
         if keyboard.is_key_just_down(self.jump_key) and self.jumping is False:
             self.jumping = True
+            self.jump_height = PLAYER_JUMP_HEIGHT
+            self.y_speed = self.jump_height
+        if keyboard.is_key_down(self.power_key):
+            pass
+
+        if keyboard.is_key_up(self.left) and self.x_speed < 0:
+            self.x_speed = 0
+        if keyboard.is_key_up(self.right) and self.x_speed > 0:
+            self.x_speed = 0
+            
+    
+    def _Power_movementInput(self):
+        if keyboard.is_key_down(self.left):
+            self.x_speed = -PLAYER_X_POWER_MOVING_SPEED
+        if keyboard.is_key_down(self.right):
+            self.x_speed = PLAYER_X_POWER_MOVING_SPEED
+        if keyboard.is_key_just_down(self.jump_key) and self.jumping is False:
+            self.jumping = True
+            self.jump_height = PLAYER_POWER_JUMP_HEIGHT
             self.y_speed = self.jump_height
         if keyboard.is_key_down(self.power_key):
             pass
@@ -76,8 +97,12 @@ class Player(Image):
                 self.y_speed = 0
     
     def move(self):
-        self.movementInput()
-        self.handleJump()
+        if self.boost:
+            self._Power_movementInput()
+            self.handleJump()
+        else:
+            self.movementInput()
+            self.handleJump()
         if self.x - PLAYER_WIDTH//2 >= LEFT_BOUNDARY and self.x + PLAYER_WIDTH//2 <= RIGHT_BOUNDARY:
             self.x += self.x_speed
         else:
