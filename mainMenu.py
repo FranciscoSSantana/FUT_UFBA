@@ -27,7 +27,7 @@ class MainMenu(Image):
     
     def start(self):
         if keyboard.is_key_just_down('space'):
-            if self.file == "P1 WINS!.png" or self.file == "P2 WINS!.png":
+            if self.file == "P1 WINS!.png" or self.file == "P2 WINS!.png" or self.file == "TIE.png":
                 self.started = True
                 self.winscreen._hide()
                 self.winmessage._hide()
@@ -56,7 +56,10 @@ class MainMenu(Image):
         self.rightgoal = Goal(False)
         self.powerbox = PowerBox()
 
-        self.winscreen = Image(f"P{self.placar.ganhador} WINS!.png", X_CENTER, Y_CENTER)
+        if self.placar.ganhador == 1 or self.placar.ganhador == 2:
+            self.winscreen = Image(f"P{self.placar.ganhador} WINS!.png", X_CENTER, Y_CENTER)
+        else:
+            self.winscreen = Image("TIE.png", X_CENTER, Y_CENTER)
         self.winscreen._hide()
         self.winmessage = Image("PRESS “Enter” TO PLAY.png", X_CENTER, MESSAGE_Y)
         self.winmessage._hide()
@@ -72,9 +75,15 @@ class MainMenu(Image):
             self.powerbox.kick_off()
     
     def checkEnd(self):
-        self.file = f"P{self.placar.ganhador} WINS!.png"
+        if self.placar.ganhador == 1 or self.placar.ganhador == 2:
+            self.file = f"P{self.placar.ganhador} WINS!.png"
+        else:
+            self.file = "TIE.png"
         self.started = False
-        self.winscreen.file = f"P{self.placar.ganhador} WINS!.png"
+        if self.placar.ganhador == 1 or self.placar.ganhador == 2:
+            self.winscreen.file = f"P{self.placar.ganhador} WINS!.png"
+        else:
+            self.winscreen.file = "TIE.png"
         self.winscreen._show()
         self.winmessage._show()
 
