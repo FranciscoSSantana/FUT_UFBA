@@ -76,4 +76,6 @@ class Placar(Image):
             self.ganhador = 2
         if self.blueScore > self.redScore:
             self.ganhador = 1
+        if self.blueScore == self.redScore:
+            self.ganhador = 3
         Pause.isPaused = True
