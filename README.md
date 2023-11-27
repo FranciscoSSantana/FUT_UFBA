@@ -20,8 +20,13 @@ Contribuições: Auxílio nas discussões de ideias, Implementação inicial do 
 
 Nota: 5
 
+## Francisco Silva Santana - 222216228
+Contribuições: Física da bola (colisões e gravidade), Detecção de Gol, Organização dos arquivos e constantes, Restart, Parte da implementação de pause, Pulo e Movimentação dos Players, Implementação das telas de início e fim.
+
+Nota: 5
+
 ## Laís Abib Gonzalez - 222115785
-Contribuições: Discussão de ideias, Implementação do placar e gravação dos vídeos
+Contribuições: Discussão de ideias, Implementação do placar, Implementação inicial de colisão Player-Bola e gravação dos vídeos
 
 Nota: 5
 
