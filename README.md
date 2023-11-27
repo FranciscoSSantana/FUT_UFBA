@@ -14,7 +14,7 @@ Cada jogador controla o seu player de escolha e interajem com a bola.
 ## Caio Adriel Barbosa dos Santos - 222215084
 Contribuições: Auxílio nas discussões de ideias, Implementação inicial do botão pause e resume, implementação do PowerBox e escrita do README.
 
-Nota: 4
+Nota: 5
 
 # Referências
 ```sh
