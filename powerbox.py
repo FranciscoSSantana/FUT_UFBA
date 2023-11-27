@@ -1,27 +1,17 @@
 from tupy import*
 from gameconstants import *
 from player import Player
-from ball import Ball
 from pause import Pause
 
-class PowerBox(Image):
-    _IsPowerBox_on = False
-    
-    @property
-    def isPowerBox_on(self):
-        return PowerBox._IsPowerBox_on
-    
-    @isPowerBox_on.setter
-    def isPowerBox_on(self, p):
-        PowerBox._IsPowerBox_on = p
+class PowerBox(BaseImage):
+    _isPowerBox_on: bool = False
 
-    
-    def __init__(self):
-        self.file = "PowerBox.png"
-        self.x = POWER_BOX_X_KICK_OFF
-        self.y = POWER_BOX_y_KICK_OFF
-        self.y_speed = POWER_BOX_Y_SPEED
-        self.direction = 1
+    def __init__(self) -> None:
+        self._file: str = "PowerBox.png"
+        self._x: int = POWER_BOX_X_KICK_OFF
+        self._y: int = POWER_BOX_Y_KICK_OFF
+        self._y_speed: int = POWER_BOX_Y_SPEED
+        self._direction: int = 1
         
         self.kick_off()
         
@@ -29,53 +19,64 @@ class PowerBox(Image):
         super()._destroy()
       
     def kick_off(self) -> None:
-        PowerBox.isPowerBox_on = False
+        '''
+        Standard start/restart function.
+        '''
+        PowerBox._isPowerBox_on = False
         self._hide()
-        self.counter = 0
-        self.power_counter = 0
+        self._counter: int = 0
+        self._power_counter: int = 0
+        playerList: list[Player] = Player.playerList()
+        for player in playerList:
+            if player.boost:
+                player.toggleBoost()
         
-    def spawn_timer(self) -> None:
-        self.counter += 1
-        if self.counter == POWER_BOX_SPAWN_TIME:
-            self.spawn()
+    def _spawn_timer(self) -> None:
+        self._counter += 1
+        if self._counter == POWER_BOX_SPAWN_TIME:
+            self._spawn()
         
-    def movement(self) -> None:
-        self.y += self.y_speed * self.direction
-        if self.y > POWER_BOX_y_KICK_OFF or self.y < POWER_BOX_y_KICK_OFF - 50:
-            self.direction *= -1
+    def _movement(self) -> None:
+        self._y += self._y_speed * self._direction
+        if self._y > POWER_BOX_Y_KICK_OFF or self._y < POWER_BOX_Y_KICK_OFF - 50:
+            self._direction *= -1
         
-    
-    def spawn(self):
+    def _spawn(self) -> None:
         self._show()
-        PowerBox.isPowerBox_on = True
+        PowerBox._isPowerBox_on = True
         
-    def detect_collision(self) -> None:
-        if PowerBox.isPowerBox_on:
-            for player in Player.PLAYERS:
+    def _detect_collision(self) -> None:
+        if PowerBox._isPowerBox_on:
+            playerList = Player.playerList()
+            for player in playerList:
                 if self._collides_with(player):
-                    player.boost = True
-                    PowerBox.isPowerBox_on = False
+                    player.toggleBoost()
+                    PowerBox._isPowerBox_on = False
                     self._hide()
-                    self.counter = 0
+                    self._counter = 0
     
-    def handlePower(self, p):
-        self.power_counter += 1
-        if self.power_counter == POWER_TIME:
-            p.boost = False
-            self.power_counter = 0
+    def _handlePower(self, player: Player) -> None:
+        '''
+        Removes power from the player after certain amount of time.
+        '''
+        self._power_counter += 1
+        if self._power_counter == POWER_TIME:
+            player.toggleBoost()
+            self._power_counter = 0
             
         
-    def update(self):
-        if not Pause.isPaused:
-            if PowerBox.isPowerBox_on:
+    def update(self) -> None:
+        if not Pause.isGamePaused():
+            if PowerBox._isPowerBox_on:
                 self._show()
-            self.movement()
-            self.spawn_timer()
-            self.detect_collision()
-            for player in Player.PLAYERS:
+            self._movement()
+            self._spawn_timer()
+            self._detect_collision()
+            playerList = Player.playerList()
+            for player in playerList:
                 if player.boost:
-                    self.handlePower(player)
+                    self._handlePower(player)
         else:
-            if PowerBox.isPowerBox_on:
+            if PowerBox._isPowerBox_on:
                 self._hide()
             
