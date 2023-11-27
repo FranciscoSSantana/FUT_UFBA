@@ -1,20 +1,20 @@
 from tupy import *
 from gameconstants import *
 
-class MenuBackground(Image):
+class MenuBackground(BaseImage):
     def __init__(self) -> None:
-        self.file = "Backmenu.png"
-        self.x = X_CENTER
-        self.y = Y_CENTER
+        self._file: str = "Backmenu.png"
+        self._x: int = X_CENTER
+        self._y: int = Y_CENTER
             
-class Resume(Image):
-    def __init__(self):
-        self.file = "resume.png"
-        self.x = X_CENTER 
-        self.y = Y_CENTER - BUTTON_OFFSET
+class Resume(BaseImage):
+    def __init__(self) -> None:
+        self._file: str = "resume.png"
+        self._x: int = X_CENTER 
+        self._y: int = Y_CENTER - BUTTON_OFFSET
             
-class Restart(Image):            
-    def __init__(self):
-        self.file = "restart.png"
-        self.x = X_CENTER 
-        self.y = Y_CENTER + BUTTON_OFFSET
+class Restart(BaseImage):            
+    def __init__(self) -> None:
+        self._file: str = "restart.png"
+        self._x: int = X_CENTER 
+        self._y: int = Y_CENTER + BUTTON_OFFSET
