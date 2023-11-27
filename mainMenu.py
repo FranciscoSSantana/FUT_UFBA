@@ -1,3 +1,4 @@
+from typing import Optional
 from tupy import *
 from gameconstants import *
 from player import Player
@@ -8,93 +9,114 @@ from pause import Pause
 from placar import Placar
 from powerbox import PowerBox
 
-class MainMenu(Image):
+class _Message(BaseImage):
+    def __init__(self, file: Optional[str] = None) -> None:
+        super().__init__(file, X_CENTER, MESSAGE_Y)
+    
+    def toggleEnter_or_Continue(self) -> None:
+        if self._file == "PressToPlay.png":
+            self._file = "PressToContinue.png"
+        else:
+            self._file = "PressToPlay.png"
+
+class _Winscreen(BaseImage):
+    def __init__(self, file: Optional[str] = None) -> None:
+        super().__init__(file, X_CENTER, Y_CENTER)
+    
+    def chooseFile(self, winner: int) -> None:
+        '''
+        Changes file based on game winner (1, 2 or 3) (number 3 represents a tie.).
+        '''
+        #data treatment
+        if winner < 0 or winner > 3:
+            self._file = "P3WINS.png"
+        else:
+            self._file = f"P{winner}WINS.png"
+
+class MainMenu(BaseImage):
     def __init__(self) -> None:
-        self.x = X_CENTER
-        self.y = Y_CENTER
-        self.file = "Home.png"
-        self.message = Image("PRESS “Enter” TO PLAY.png", X_CENTER, MESSAGE_Y)
-        self.counter = MESSAGE_FLICK_SPEED
-        self.started = False
+        self._x: int = X_CENTER
+        self._y: int = Y_CENTER
+        self._file: str = "Home.png"
+        self._message: _Message = _Message("PressToPlay.png")
+        self._counter: int = MESSAGE_FLICK_SPEED
+        self._started: bool = False
     
-    def messageFlick(self, message):
-        self.counter -= 1
-        if self.counter == MESSAGE_FLICK_SPEED/2:
+    def _messageFlick(self, message: _Message) -> None:
+        self._counter -= 1
+        if self._counter == MESSAGE_FLICK_SPEED/2:
             message._show()
-        if self.counter == 0:
+        if self._counter == 0:
             message._hide()
-            self.counter = MESSAGE_FLICK_SPEED
+            self._counter = MESSAGE_FLICK_SPEED
     
-    def start(self):
-        if keyboard.is_key_just_down('space'):
-            if self.file == "P1 WINS!.png" or self.file == "P2 WINS!.png" or self.file == "TIE.png":
-                self.started = True
-                self.winscreen._hide()
-                self.winmessage._hide()
-                self.pause.gameRestart = True
-                self.checkRestart()
+    def _start(self) -> None:
+        '''
+        Handles start and restart of the game upon pressing "Enter".
+        '''
+        if keyboard.is_key_just_down('Return'):
+            if self._file == "P1WINS.png" or self._file == "P2WINS.png" or self._file == "P3WINS.png":
+                self._started = True
+                self._winscreen._hide()
+                self._winmessage._hide()
+                self._doRestart()
 
-            if self.file == "Commands.png":
-                self.started = True
-                self.message._hide()
+            if self._file == "Commands.png":
+                self._started = True
+                self._message._hide()
                 self._hide()
-                self.counter = MESSAGE_FLICK_SPEED
-                self.startNewGame()
+                self._counter = MESSAGE_FLICK_SPEED
+                self._startNewGame()
 
-            if self.file == "Home.png":
-                self.file = "Commands.png"
-                self.message.file = "PRESS “Enter” TO CONTINUE.png"
+            if self._file == "Home.png":
+                self._file = "Commands.png"
+                self._message.toggleEnter_or_Continue()
 
-    def startNewGame(self):
-        self.background = Background()
-        self.playerBlue = Player(True)
-        self.playerRed = Player(False)
-        self.placar = Placar()
-        self.bola = Ball(self.placar)
-        self.pause = Pause()
-        self.leftgoal = Goal(True)
-        self.rightgoal = Goal(False)
-        self.powerbox = PowerBox()
+    def _startNewGame(self) -> None:
+        self._background: Background = Background()
+        self._playerBlue: Player = Player(True)
+        self._playerRed: Player = Player(False)
+        self._bola: Ball = Ball()
+        self._placar: Placar = Placar(self._bola)
+        self._powerbox: PowerBox = PowerBox()
+        self._pause: Pause = Pause()
+        self._leftgoal: Goal = Goal(True)
+        self._rightgoal: Goal = Goal(False)
 
-        if self.placar.ganhador == 1 or self.placar.ganhador == 2:
-            self.winscreen = Image(f"P{self.placar.ganhador} WINS!.png", X_CENTER, Y_CENTER)
-        else:
-            self.winscreen = Image("TIE.png", X_CENTER, Y_CENTER)
-        self.winscreen._hide()
-        self.winmessage = Image("PRESS “Enter” TO PLAY.png", X_CENTER, MESSAGE_Y)
-        self.winmessage._hide()
+        self._winscreen: _Winscreen = _Winscreen()
+        self._winscreen._hide()
+        self._winmessage: _Message = _Message("PressToPlay.png")
+        self._winmessage._hide()
     
-    def checkRestart(self):
-        if self.pause.gameRestart:
-            self.background.kick_off()
-            self.playerBlue.kick_off()
-            self.playerRed.kick_off()
-            self.placar.kick_off()
-            self.bola.kick_off()
-            self.pause.kick_off()
-            self.powerbox.kick_off()
+    def _checkRestart(self) -> None:
+        if self._pause.gameRestart:
+            self._doRestart()
     
-    def checkEnd(self):
-        if self.placar.ganhador == 1 or self.placar.ganhador == 2:
-            self.file = f"P{self.placar.ganhador} WINS!.png"
-        else:
-            self.file = "TIE.png"
-        self.started = False
-        if self.placar.ganhador == 1 or self.placar.ganhador == 2:
-            self.winscreen.file = f"P{self.placar.ganhador} WINS!.png"
-        else:
-            self.winscreen.file = "TIE.png"
-        self.winscreen._show()
-        self.winmessage._show()
+    def _doRestart(self) -> None:
+        self._background.kick_off()
+        self._playerBlue.kick_off()
+        self._playerRed.kick_off()
+        self._placar.kick_off()
+        self._bola.kick_off()
+        self._pause.kick_off()
+        self._powerbox.kick_off()
+    
+    def _endGame(self) -> None:
+        self._file = f"P{self._placar.winner}WINS.png"
+        self._started = False
+        self._winscreen.chooseFile(self._placar.winner)
+        self._winscreen._show()
+        self._winmessage._show()
 
     def update(self) -> None:
-        if not self.started:
-            self.start()
-            if self.file == "Home.png" or self.file == "Commands.png":
-                self.messageFlick(self.message)
+        if not self._started:
+            self._start()
+            if self._file == "Home.png" or self._file == "Commands.png":
+                self._messageFlick(self._message)
             else:
-                self.messageFlick(self.winmessage)
+                self._messageFlick(self._winmessage)
         else:
-            self.checkRestart()
-            if self.placar.ganhador != 0:
-                self.checkEnd()
+            self._checkRestart()
+            if self._placar.winner != 0:
+                Pause.freeze()
+                self._endGame()
