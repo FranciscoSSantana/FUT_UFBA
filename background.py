@@ -1,19 +1,23 @@
 from tupy import *
 from gameconstants import *
+from random import choice
 
-class Background(Image):
-
-    backgrounds = ["CampJapan.png", 
-                   "CampBrasil.png", 
-                   "CampEgypt.png", 
-                   "CampItaly.png", 
-                   "CampParis.png", 
-                   "CampUS.png"]
+class Background(BaseImage):
     
     def __init__(self) -> None:
-        self._x = X_CENTER
-        self._y = Y_CENTER
+        self._x: int = X_CENTER
+        self._y: int = Y_CENTER
         self.kick_off()
     
-    def kick_off(self):
-        self.file = random.choice(Background.backgrounds)
+    def kick_off(self) -> None:
+        '''
+        reset, set random background
+        '''
+        backgrounds: list[str] = ["CampJapan.png", 
+                      "CampBrasil.png", 
+                      "CampEgypt.png", 
+                      "CampItaly.png", 
+                      "CampParis.png", 
+                      "CampUS.png"]
+        
+        self._file: str = choice(backgrounds)
