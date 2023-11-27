@@ -20,6 +20,11 @@ Contribuições: Auxílio nas discussões de ideias, Implementação inicial do 
 
 Nota: 5
 
+##Laís Abib Gonzalez - 222115785
+Contribuições: Discussão de ideias, Implementação do placar e gravação dos vídeos
+
+Nota: 5
+
 ## Lucas Sampaio Souza Andrade - 220115578
 Contribuições: Criação das artes do jogo, Adição de rotação da bola, Posicionamento de assets em campo.
 
